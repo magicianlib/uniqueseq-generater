@@ -18,6 +18,7 @@ public class Config {
         taskExecutor.setQueueCapacity(Integer.MAX_VALUE);
         taskExecutor.setKeepAliveSeconds(60);
         taskExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
+        taskExecutor.setThreadNamePrefix("task-");
         taskExecutor.initialize();
         return taskExecutor;
     }

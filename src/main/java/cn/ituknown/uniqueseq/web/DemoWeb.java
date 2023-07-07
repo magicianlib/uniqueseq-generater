@@ -28,7 +28,7 @@ public class DemoWeb {
 
     @PostMapping("/applySeq")
     public ApplySeqResponse createBlock(@Validated @RequestBody ApplySeqRequest request) {
-        if (!commonSeqService.verifySeqname(request.getSeqname())) {
+        if (!commonSeqService.exist(request.getSeqname())) {
             throw new IllegalArgumentException(String.format("seqname:%s非法, 请先申请该序列号.", request.getSeqname()));
         }
 
@@ -39,7 +39,7 @@ public class DemoWeb {
 
     @PostMapping("/batchApplySeq")
     public BatchApplySeqResponse createBlock(@Validated @RequestBody BatchApplySeqRequest request) {
-        if (!commonSeqService.verifySeqname(request.getSeqname())) {
+        if (!commonSeqService.exist(request.getSeqname())) {
             throw new IllegalArgumentException(String.format("seqname:%s非法, 请先申请该序列号.", request.getSeqname()));
         }
 
@@ -47,5 +47,4 @@ public class DemoWeb {
         response.setSeqList(commonSeqService.take(request.getSeqname(), request.getSize()));
         return response;
     }
-
 }

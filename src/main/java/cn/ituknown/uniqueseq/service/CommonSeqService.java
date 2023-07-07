@@ -20,6 +20,11 @@ public class CommonSeqService extends AbstractSeqService {
     private SeqBlockRepository seqBlockRepository;
 
     @Override
+    protected BlockTypeEnum type() {
+        return BlockTypeEnum.COMMON;
+    }
+
+    @Override
     protected List<String> seqnameList() {
         return seqBlockRepository.findAllSeqname();
     }
@@ -32,11 +37,6 @@ public class CommonSeqService extends AbstractSeqService {
     @Override
     protected TaskExecutor executor() {
         return taskExecutor;
-    }
-
-    @Override
-    protected BlockTypeEnum type() {
-        return BlockTypeEnum.COMMON;
     }
 
     @Override

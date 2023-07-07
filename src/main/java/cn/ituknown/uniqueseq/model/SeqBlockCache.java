@@ -28,7 +28,7 @@ public class SeqBlockCache {
      */
     private static final int BLOCK_MIN_LIMIT = 3;
 
-    private static final int BLOCK_MAX_LIMIT = 10;
+    private static final int BLOCK_MAX_LIMIT = 16;
 
     /**
      * 序列块名称

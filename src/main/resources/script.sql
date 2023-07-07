@@ -1,3 +1,5 @@
+-- noinspection SqlNoDataSourceInspectionForFile
+
 create schema `unique-seq` collate utf8mb4_bin;
 
 -- auto-generated definition

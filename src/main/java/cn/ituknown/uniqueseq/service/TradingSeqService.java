@@ -12,6 +12,11 @@ import java.util.function.Function;
 public class TradingSeqService extends AbstractSeqService {
 
     @Override
+    protected BlockTypeEnum type() {
+        return BlockTypeEnum.TRADING;
+    }
+
+    @Override
     protected List<String> seqnameList() {
         return Collections.emptyList();
     }
@@ -26,11 +31,6 @@ public class TradingSeqService extends AbstractSeqService {
     protected TaskExecutor executor() {
         // TODO: Depending on the business
         return null;
-    }
-
-    @Override
-    protected BlockTypeEnum type() {
-        return BlockTypeEnum.TRADING;
     }
 
     @Override

@@ -54,7 +54,6 @@ public class SeqBlockRepositoryImpl implements SeqBlockRepository {
         } while (!update); // Try again until successful.
 
         return Pair.of(old.getSeqmax() + 1, latestSeqMax);
-
     }
 
     @Override
