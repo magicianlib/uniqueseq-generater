@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
@@ -37,18 +36,18 @@ public class SeqBlockCache {
 
     private final Function<String, Pair<Long, Long>> function;
 
-    private final TaskExecutor taskExecutor;
+    private final TaskExecutor executor;
 
     private final List<SeqBlock> blocks = new ArrayList<>();
 
-    private final ReadWriteLock lock = new ReentrantReadWriteLock();
+    private final ReentrantReadWriteLock rw = new ReentrantReadWriteLock();
 
     private final AtomicBoolean supplementing = new AtomicBoolean(false);
 
-    public SeqBlockCache(String seqname, Function<String, Pair<Long, Long>> function, TaskExecutor taskExecutor) {
+    public SeqBlockCache(String seqname, Function<String, Pair<Long, Long>> function, TaskExecutor executor) {
         this.seqname = seqname;
         this.function = function;
-        this.taskExecutor = taskExecutor;
+        this.executor = executor;
         try {
             syncSupplementBlock(); // 同步填充序列块
         } catch (Exception e) {
@@ -57,7 +56,7 @@ public class SeqBlockCache {
     }
 
     public Long take() {
-        lock.readLock().lock();
+        rw.readLock().lock();
         boolean exhausted = blocks.size() < BLOCK_MIN_LIMIT;
         try {
             Long result = null;
@@ -72,7 +71,7 @@ public class SeqBlockCache {
             }
             return result;
         } finally {
-            lock.readLock().unlock();
+            rw.readLock().unlock();
             if (exhausted) { // 异步补充序列块
                 LOGGER.info("take: {} is exhausted!, asyncSupplementBlock...", seqname);
                 asyncSupplementBlock();
@@ -81,7 +80,7 @@ public class SeqBlockCache {
     }
 
     public List<Long> take(int size) {
-        lock.readLock().lock();
+        rw.readLock().lock();
         List<Long> result = new ArrayList<>();
         boolean exhausted = blocks.size() < BLOCK_MIN_LIMIT;
         try {
@@ -98,7 +97,7 @@ public class SeqBlockCache {
             }
             return result;
         } finally {
-            lock.readLock().unlock();
+            rw.readLock().unlock();
             if (exhausted) {
                 LOGGER.info("take(int): {} is exhausted!, asyncSupplementBlock...", seqname);
                 asyncSupplementBlock();
@@ -112,7 +111,7 @@ public class SeqBlockCache {
     private void asyncSupplementBlock() {
         removeExhaustedBlock();
         if (supplementing.compareAndSet(false, true)) {
-            taskExecutor.execute(() -> {
+            executor.execute(() -> {
                 try {
                     syncSupplementBlock();
                 } catch (Exception e) {
@@ -141,11 +140,11 @@ public class SeqBlockCache {
      * 补充序列块
      */
     private void supplementBlock(Pair<Long, Long> range) {
-        lock.writeLock().lock();
+        rw.writeLock().lock();
         try {
             blocks.add(new SeqBlock(range));
         } finally {
-            lock.writeLock().unlock();
+            rw.writeLock().unlock();
         }
     }
 
@@ -153,11 +152,15 @@ public class SeqBlockCache {
      * 移除已耗尽的Block
      */
     private void removeExhaustedBlock() {
-        lock.writeLock().lock();
+        rw.writeLock().lock();
         try {
             blocks.removeIf(SeqBlock::isExhausted);
         } finally {
-            lock.writeLock().unlock();
+            rw.writeLock().unlock();
         }
+    }
+
+    final public ReentrantReadWriteLock lock() {
+        return rw;
     }
 }

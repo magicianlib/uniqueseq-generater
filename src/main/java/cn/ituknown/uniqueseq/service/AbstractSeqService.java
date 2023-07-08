@@ -2,18 +2,18 @@ package cn.ituknown.uniqueseq.service;
 
 import cn.ituknown.uniqueseq.enums.BlockTypeEnum;
 import cn.ituknown.uniqueseq.model.SeqBlockCache;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.task.TaskExecutor;
 
 import javax.annotation.PostConstruct;
-import java.util.List;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import java.util.function.Function;
 
 public abstract class AbstractSeqService {
@@ -22,7 +22,7 @@ public abstract class AbstractSeqService {
 
     private final ReentrantLock LOCK = new ReentrantLock();
 
-    private final ConcurrentHashMap<String, SeqBlockCache> seqnameCache = new ConcurrentHashMap<>();
+    private final Map<String, SeqBlockCache> seqnameCache = new ConcurrentHashMap<>();
 
     /**
      * 序列块业务类型
@@ -69,9 +69,10 @@ public abstract class AbstractSeqService {
     }
 
     private void initCacheList(List<String> seqnameList) {
+        removeCacheIfAbandoned(seqnameList);
         CountDownLatch countDownLatch = new CountDownLatch(seqnameList.size());
         try {
-            for (String seqname : seqnameList()) {
+            for (String seqname : seqnameList) {
                 executor().execute(() -> {
                     try {
                         LOGGER.info("initCacheIfNeed(seqname='{}')...", seqname);
@@ -94,6 +95,33 @@ public abstract class AbstractSeqService {
                 if (!seqnameCache.containsKey(seqname)) {
                     LOGGER.info("initCache(seqname='{}')", seqname);
                     seqnameCache.put(seqname, new SeqBlockCache(seqname, addBlock(), executor()));
+                }
+            } finally {
+                LOCK.unlock();
+            }
+        }
+    }
+
+    /**
+     * 移除废弃序列块
+     */
+    private void removeCacheIfAbandoned(List<String> seqnameList) {
+        Collection<String> subtract = CollectionUtils.subtract(seqnameCache.keySet(), seqnameList);
+        LOGGER.info("removeCacheIfAbandoned, subtract={}", subtract);
+        if (CollectionUtils.isNotEmpty(subtract)) {
+            LOCK.lock();
+            try {
+                subtract = CollectionUtils.subtract(seqnameCache.keySet(), seqnameList);
+                if (CollectionUtils.isNotEmpty(subtract)) {
+                    for (String seqname : subtract) {
+                        if (seqnameCache.containsKey(seqname)) {
+                            final ReentrantReadWriteLock rw = seqnameCache.get(seqname).lock();
+                            if (rw.getReadLockCount() == 0 && rw.getWriteHoldCount() == 0) {
+                                LOGGER.info("seqname='{}' has been abandoned, remove!", seqname);
+                                seqnameCache.remove(seqname);
+                            }
+                        }
+                    }
                 }
             } finally {
                 LOCK.unlock();
