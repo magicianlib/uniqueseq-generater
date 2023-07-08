@@ -1,6 +1,6 @@
 package cn.ituknown.uniqueseq.repository;
 
-import cn.ituknown.uniqueseq.request.ApplyBlockRequest;
+import cn.ituknown.uniqueseq.request.AddBlockRequest;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
@@ -20,5 +20,5 @@ public interface SeqBlockRepository {
     /**
      * 申请新序列块
      */
-    void applySeqBlock(ApplyBlockRequest request);
+    void applySeqBlock(AddBlockRequest request);
 }

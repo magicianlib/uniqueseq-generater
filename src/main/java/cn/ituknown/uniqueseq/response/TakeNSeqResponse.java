@@ -10,7 +10,7 @@ import java.util.List;
 @Getter
 @Setter
 @ToString
-public class BatchApplySeqResponse implements Serializable {
+public class TakeNSeqResponse implements Serializable {
 
-    private List<Long> seqList;
+    private List<Long> data;
 }

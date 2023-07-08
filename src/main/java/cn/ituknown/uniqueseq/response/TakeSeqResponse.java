@@ -9,7 +9,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
-public class ApplySeqResponse implements Serializable {
+public class TakeSeqResponse implements Serializable {
 
-    private Long seq;
+    private Long data;
 }

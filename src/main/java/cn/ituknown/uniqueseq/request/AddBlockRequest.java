@@ -11,7 +11,7 @@ import java.io.Serializable;
 @Getter
 @Setter
 @ToString
-public class ApplyBlockRequest implements Serializable {
+public class AddBlockRequest implements Serializable {
 
     @NotBlank
     private String seqname;

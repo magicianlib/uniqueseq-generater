@@ -3,7 +3,7 @@ package cn.ituknown.uniqueseq.repository.impl;
 import cn.ituknown.uniqueseq.mapper.SeqBlockMapper;
 import cn.ituknown.uniqueseq.po.SeqBlockPo;
 import cn.ituknown.uniqueseq.repository.SeqBlockRepository;
-import cn.ituknown.uniqueseq.request.ApplyBlockRequest;
+import cn.ituknown.uniqueseq.request.AddBlockRequest;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.beans.factory.annotation.Value;
@@ -57,7 +57,7 @@ public class SeqBlockRepositoryImpl implements SeqBlockRepository {
     }
 
     @Override
-    public void applySeqBlock(ApplyBlockRequest request) {
+    public void applySeqBlock(AddBlockRequest request) {
         if (Objects.isNull(request.getSeqmax())) {
             request.setSeqmax(defaultSeqMax);
         }
