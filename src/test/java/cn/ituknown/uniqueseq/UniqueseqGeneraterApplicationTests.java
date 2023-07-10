@@ -24,7 +24,24 @@ class UniqueseqGeneraterApplicationTests {
     private static final Logger LOGGER = LoggerFactory.getLogger(UniqueseqGeneraterApplicationTests.class);
 
     @Test
-    void contextLoads() throws Exception {
+    void seqtake() throws Exception {
+
+        MockHttpServletRequestBuilder request = MockMvcRequestBuilders
+                .post("/api/seq/take")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"seqname\":\"commons\"}");
+
+        mockMvc.perform(request)
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON))
+                .andDo(result -> {
+                    String response = result.getResponse().getContentAsString(StandardCharsets.UTF_8);
+                    LOGGER.info("response: {}", response);
+                });
+    }
+
+    @Test
+    void seqtakeN() throws Exception {
 
         MockHttpServletRequestBuilder request = MockMvcRequestBuilders
                 .post("/api/seq/take/{n}", 10)

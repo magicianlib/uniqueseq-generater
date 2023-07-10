@@ -5,13 +5,18 @@ import cn.ituknown.uniqueseq.request.TakeSeqRequest;
 import cn.ituknown.uniqueseq.response.TakeNSeqResponse;
 import cn.ituknown.uniqueseq.response.TakeSeqResponse;
 import cn.ituknown.uniqueseq.service.CommonSeqService;
+import org.springframework.http.MediaType;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 
 @RestController
-@RequestMapping("/")
+@RequestMapping(
+        value = "/",
+        consumes = {MediaType.APPLICATION_JSON_VALUE},
+        produces = {MediaType.APPLICATION_JSON_VALUE}
+)
 public class SeqBlockWeb {
 
     @Resource
@@ -23,7 +28,7 @@ public class SeqBlockWeb {
     }
 
     @PostMapping("/api/seq/take")
-    public TakeSeqResponse createBlock(@Validated @RequestBody TakeSeqRequest request) {
+    public TakeSeqResponse seqtake(@Validated @RequestBody TakeSeqRequest request) {
         if (!commonSeqService.exist(request.getSeqname())) {
             throw new IllegalArgumentException(String.format("seqname:%s illegal, please apply seqname first", request.getSeqname()));
         }
@@ -34,7 +39,7 @@ public class SeqBlockWeb {
     }
 
     @PostMapping("/api/seq/take/{n}")
-    public TakeNSeqResponse createBlock(@PathVariable Integer n, @Validated @RequestBody TakeSeqRequest request) {
+    public TakeNSeqResponse seqtakeN(@PathVariable Integer n, @Validated @RequestBody TakeSeqRequest request) {
         if (n <= 0) {
             throw new IllegalArgumentException(String.format("seqname: %s take N, must be greater than zero", request.getSeqname()));
         }
