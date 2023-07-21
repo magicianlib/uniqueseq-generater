@@ -77,3 +77,8 @@ hs_err_pid*
 replay_pid*
 
 .DS_Store
+/**/.DS_Store
+
+# flatten-maven-plugin
+.flattened-pom.xml
+/**/.flattened-pom.xml

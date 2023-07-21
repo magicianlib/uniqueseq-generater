@@ -11,7 +11,7 @@
 
     <groupId>cn.ituknown</groupId>
     <artifactId>uniqueseq-generater</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>${revision}</version>
     <name>uniqueseq-generater</name>
     <description>uniqueseq-generater</description>
 
@@ -20,6 +20,8 @@
         <mybatis-plus.verson>3.5.3.1</mybatis-plus.verson>
         <commons-lang3.version>3.11</commons-lang3.version>
         <commons-collections4.version>4.4</commons-collections4.version>
+
+        <revision>0.0.1-SNAPSHOT</revision>
     </properties>
 
     <dependencies>
@@ -86,6 +88,34 @@
                         </exclude>
                     </excludes>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>flatten-maven-plugin</artifactId>
+                <version>1.5.0</version>
+                <configuration>
+                    <!-- 是否更新pom文件, 记得设置为true, 不然无法更新module里的pom版本号 -->
+                    <updatePomFile>true</updatePomFile>
+                    <flattenMode>resolveCiFriendliesOnly</flattenMode>
+                </configuration>
+                <executions>
+                    <!-- enable flattening -->
+                    <execution>
+                        <id>flatten</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>flatten</goal>
+                        </goals>
+                    </execution>
+                    <!-- ensure proper cleanup -->
+                    <execution>
+                        <id>flatten.clean</id>
+                        <phase>clean</phase>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>

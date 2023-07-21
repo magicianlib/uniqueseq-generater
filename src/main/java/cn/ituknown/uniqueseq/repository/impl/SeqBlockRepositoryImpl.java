@@ -36,7 +36,7 @@ public class SeqBlockRepositoryImpl implements SeqBlockRepository {
     public Pair<Long, Long> generateBlockRange(String seqname) {
 
         boolean update;
-        long latestSeqMax;
+        long latestSeqmax;
         SeqBlockPo old;
         do {
             if (Objects.isNull(old = seqBlockMapper.selectById(seqname))) {
@@ -44,16 +44,16 @@ public class SeqBlockRepositoryImpl implements SeqBlockRepository {
             }
 
             // new max seq
-            latestSeqMax = (old.getSeqmax() + old.getSeqstep());
+            latestSeqmax = (old.getSeqmax() + old.getSeqstep());
 
             LambdaUpdateWrapper<SeqBlockPo> updateWrapper = new LambdaUpdateWrapper<>();
-            updateWrapper.set(SeqBlockPo::getSeqmax, latestSeqMax).set(SeqBlockPo::getUpdateTime, LocalDateTime.now());
+            updateWrapper.set(SeqBlockPo::getSeqmax, latestSeqmax).set(SeqBlockPo::getUpdateTime, LocalDateTime.now());
             updateWrapper.eq(SeqBlockPo::getSeqname, seqname).eq(SeqBlockPo::getSeqmax, old.getSeqmax());
 
             update = seqBlockMapper.update(null, updateWrapper) > 0;
         } while (!update); // Try again until successful.
 
-        return Pair.of(old.getSeqmax() + 1, latestSeqMax);
+        return Pair.of(old.getSeqmax() + 1, latestSeqmax);
     }
 
     @Override
